@@ -1,0 +1,293 @@
+<!py
+from style import PROFILESTYLE
+import urllib.request
+import requests
+import json
+
+response.modstatus('200 OK')
+response.header('Content-Type', 'text/html')
+
+username = GET.get('user', [None])[0]
+
+profile = None
+repos = []
+error = None
+
+LANGCOLORS = {
+    'Python': '#6fdf79', 'JavaScript': '#f7df1e', 'TypeScript': '#3178c6',
+    'HTML': '#e34c26', 'CSS': '#563d7c', 'Java': '#b07219', 'C': '#555555',
+    'C++': '#f34b7d', 'C#': '#178600', 'Go': '#00add8', 'Rust': '#dea584',
+    'Ruby': '#701516', 'PHP': '#4f5d95', 'Shell': '#89e051',
+    'Swift': '#fa7343', 'Kotlin': '#a97bff', 'Dart': '#00b4ab',
+}
+
+def langColor(lang):
+    return LANGCOLORS.get(lang, '#64748b')
+
+def fmtnumber(n):
+    if n >= 1000:
+        return f'{n/1000:.1f}k'
+    return str(n)
+
+if username:
+    try:
+        req = urllib.request.Request(
+            f'https://api.github.com/users/{username}',
+            headers={'User-Agent': 'pym-engine/1.0', 'Accept': 'application/vnd.github.v3+json'}
+        )
+        with urllib.request.urlopen(req, timeout=6) as r:
+            profile = json.loads(r.read().decode())
+
+        if profile.get('message') == 'Not Found':
+            error = 'not-found'
+            profile = None
+        else:
+            req2 = urllib.request.Request(
+                f'https://api.github.com/users/{username}/repos?sort=stars&per_page=6&type=public',
+                headers={'User-Agent': 'pym-engine/1.0', 'Accept': 'application/vnd.github.v3+json'}
+            )
+            with urllib.request.urlopen(req2, timeout=6) as r2:
+                repos = json.loads(r2.read().decode())
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            error = 'not-found'
+        elif e.code == 403:
+            error = 'rate=limit'
+        else:
+            error = 'error'
+    except Exception:
+        error = 'error'
+
+def Iconify(name) :
+    coleccion = 'line-md'
+    icono = name
+
+    url = f'https://api.iconify.design/{coleccion}/{icono}.svg'
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        return response.text
+    
+    return (<pre>error: no icon '{name}' {response.status_code}</pre>)
+!>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+    <!py
+    if profile:
+        echo(f"@{profile['login']} · GitHub Profile")
+    else:
+        echo('GitHub Profile Explorer · Pym')
+    !>
+    </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://raw.githubusercontent.com/davidleonstr/pym/refs/heads/main/assets/icons/pym.svg">
+    <!= PROFILESTYLE !>
+</head>
+<body>
+<div class="container">
+    <nav>
+        <div class="logo">PY<span>M</span></div>
+        <div>
+            <a href="https://github.com/davidleonstr/pym" class="btn btn-ghost">GitHub</a>
+        </div>
+    </nav>
+
+    <section class="search-section">
+        <h1>GitHub Profile<br>Explorer</h1>
+        <p>Powered by the Pym engine · GitHub REST API</p>
+        <form class="search-form" method="GET" action="">
+            <input
+                class="search-input"
+                type="text"
+                name="user"
+                placeholder="Enter a GitHub username"
+                value="<!= username or str() !>"
+                autofocus
+            />
+            <button class="btn" type="submit">Search</button>
+        </form>
+    </section>
+
+    <!py
+    if not username:
+        echo(
+            TAG(
+                'div', 
+                [
+                    TAG('div', Iconify('search-twotone'), {'class': 'icon'}), 
+                    TAG('h2', 'Search any GitHub user'),
+                    TAG('p', 'Type a username above to explore their public profile and repositories.')
+                ],
+                {'class': 'state-box'}
+            )
+        )
+    elif error == 'not-found':
+        echo(
+            TAG(
+                'div', 
+                [
+                    TAG('div', Iconify('account'), {'class': 'icon'}), 
+                    TAG('h2', 'User not found'),
+                    TAG('p', f'No GitHub account matches <strong>@{username}</strong>. Check the spelling and try again.')
+                ],
+                {'class': 'state-box'}
+            )
+        )
+    elif error == 'rate=limit':
+        echo(
+            TAG(
+                'div', 
+                [
+                    TAG('div', Iconify('beer-alt-solid-loop'), {'class': 'icon'}), 
+                    TAG('h2', 'Rate limit reached'),
+                    TAG('p', 'GitHub API rate limit exceeded. Please wait a minute and try again.')
+                ],
+                {'class': 'state-box'}
+            )
+        )
+    elif error == 'error':
+        echo(
+            TAG(
+                'div', 
+                [
+                    TAG('div', Iconify('alert-twotone'), {'class': 'icon'}), 
+                    TAG('h2', 'Something went wrong'),
+                    TAG('p', 'Could not connect to the GitHub API. Check your network and try again.')
+                ],
+                {'class': 'state-box'}
+            )
+        )
+    !>
+
+    <!py
+    if profile:
+        name = profile.get('name') or profile['login']
+        login = profile['login']
+        bio = profile.get('bio') or str()
+        avatar = profile.get('avatar_url', str())
+        location = profile.get('location') or str()
+        blog = profile.get('blog') or str()
+        company = profile.get('company') or str()
+        twitter = profile.get('twitter_username') or str()
+        publicRepos = profile.get('public_repos', 0)
+        followers = profile.get('followers', 0)
+        following = profile.get('following', 0)
+        ghurl = profile.get('html_url', str())
+        created = profile.get('created_at', str())[:4]
+
+        totalStars = sum(r.get('stargazers_count', 0) for r in repos)
+        topLangs = list(dict.fromkeys(
+            r['language'] for r in repos if r.get('language')
+        ))[:4]
+
+        sidebar = (
+            <div class="profile-card">
+                <img class="avatar" src="{avatar}" alt="{login}" />
+                <div class="profile-name">{name}</div>
+                <div class="profile-login">@{login}</div>
+                {f'<div class="profile-bio">{bio}</div>' if bio else str()}
+                <div class="profile-meta">
+                    {f'<span>{Iconify('home-twotone')} {company.strip()}</span>' if company else str()}
+                    {f'<span>{Iconify('my-location')} {location}</span>' if location else str()}
+                    {f'<span>{Iconify('link')} <a href="{blog}" target="_blank">{blog}</a></span>' if blog else str()}
+                    {f'<span>{Iconify('twitter')} <a href="https://twitter.com/{twitter}" target="_blank">@{twitter}</a></span>' if twitter else str()}
+                    <span>{Iconify('calendar')} Member since {created}</span>
+                </div>
+                <div class="followers-row">
+                    <span><strong>{fmtnumber(followers)}</strong> followers</span>
+                    <span><strong>{fmtnumber(following)}</strong> following</span>
+                </div>
+            </div>
+        )
+
+        stats = (
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-value">{fmtnumber(publicRepos)}</div>
+                    <div class="stat-label">Public Repos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{fmtnumber(followers)}</div>
+                    <div class="stat-label">Followers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{fmtnumber(totalStars)}</div>
+                    <div class="stat-label">Total Stars</div>
+                </div>
+            </div>
+        )
+
+        def RepoCard(r):
+            rname = r['name']
+            rdesc = r.get('description') or 'No description.'
+            rurl = r.get('html_url', str())
+            rlang = r.get('language') or str()
+            rstars = r.get('stargazers_count', 0)
+            rforks = r.get('forks_count', 0)
+            color = langColor(rlang)
+            langTag = f'<span><span class="lang-dot" style="background:{color};"></span>{rlang}</span>' if rlang else str()
+            return (
+                <div class="repo-card">
+                    <a class="repo-name" href="{rurl}" target="_blank">{rname}</a>
+                    <div class="repo-desc">{rdesc[:90]}{'...' if len(rdesc) > 90 else str()}</div>
+                    <div class="repo-meta">
+                        {langTag}
+                        <span>{Iconify('star-filled')} {fmtnumber(rstars)}</span>
+                        <span>{Iconify('fork-left')} {fmtnumber(rforks)}</span>
+                    </div>
+                </div>
+            )
+
+        repoCards = str().join(str(RepoCard(r)) for r in repos)
+
+        reposSection = (
+            <div>
+                <div class="section-title">Top Repositories</div>
+                <div class="repos-grid">
+                    {repoCards}
+                </div>
+                <div style="text-align:center; margin-top:1rem;">
+                    <a class="btn btn-ghost" href="{ghurl}?tab=repositories" target="_blank">
+                        View all repositories →
+                    </a>
+                </div>
+            </div>
+        )
+
+        langBadges = str()
+        for l in topLangs:
+            c = langColor(l)
+            langBadges += f'<span class="badge" style="background:rgba(0,0,0,0.3); border:1px solid {c}; color:{c};">{l}</span> '
+
+        mainContent = (
+            <div>
+                {stats}
+                {f'<div style="margin-bottom:1.5rem; display:flex; gap:0.5rem; flex-wrap:wrap;">{langBadges}</div>' if langBadges else str()}
+                {reposSection}
+            </div>
+        )
+
+        layout = (
+            <div class="profile-grid">
+                {sidebar}
+                {mainContent}
+            </div>
+        )
+
+        echo(str(layout))
+    !>
+
+    <footer>
+        <p>Rendered with <strong>PYM</strong> · Python-powered templates · GitHub REST API</p>
+    </footer>
+
+</div>
+</body>
+</html>

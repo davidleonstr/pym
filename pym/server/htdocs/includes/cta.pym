@@ -1,0 +1,7 @@
+<section class="cta-section">
+    <h2>Ready to experiment?</h2>
+    <p style="margin-bottom: 2rem; color: var(--text-dim);">Clone Pym and start building dynamic pages with Python today.</p>
+    <code>git clone https://github.com/davidleonstr/pym.git</code>
+    <br><br>
+    <a href="/profile.pym" class="btn">Try One Project</a>
+</section>

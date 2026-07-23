@@ -1,0 +1,78 @@
+<!py
+from style import INDEXESTYLE
+from constants import EXAMPLECODE
+
+response.modstatus('200 Success')
+response.cookie('cookie', 'cookie-value')
+
+ROLE = GET.get('role', ['Guest'])[0]
+
+def StatusBadge(color):
+    return (
+        <span style="color: {color};">
+            Active
+        </span>
+    )
+
+def WelcomeHeader(role):
+    return (<h2>Welcome back, '{role}'!</h2>)
+
+def CodeWindow(title, content):
+    return (
+        <div class="code-window">
+            <div class="code-header">
+                <div class="dot" style="background: #ff5f56;"></div>
+                <div class="dot" style="background: #ffbd2e;"></div>
+                <div class="dot" style="background: #27c93f;"></div>
+                <span style="margin-left: 10px; font-size: 0.7rem; color: #64748b;">{title}</span>
+            </div>
+            <div class="code-content">
+                {content}
+            </div>
+        </div>
+    )
+
+HEADER = WelcomeHeader(ROLE)
+
+LIVEOUTPUT = (
+    <div class="profile-card">
+        {HEADER}
+        <p>Status: {StatusBadge('#4ade80')}</p>
+    </div>
+)
+!>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pym (Python Markup Engine)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://raw.githubusercontent.com/davidleonstr/pym/refs/heads/main/assets/icons/pym.svg">
+    <!= INDEXESTYLE !>
+</head>
+<body>
+    <div class="container">
+        <!include includes/nav.pym !>
+
+        <header>
+            <span class="badge">Experimental Python Web Engine</span>
+            <h1>Think PHP.<br>Write Python.</h1>
+            <p class="hero-subtitle">
+                The simplicity of server-side markup meets the power of the Python ecosystem. 
+                Embed logic directly in your HTML with Pym.
+            </p>
+
+            <!= CodeWindow('profile.pym', EXAMPLECODE) !>
+            <!= CodeWindow('Executed profile.pym', LIVEOUTPUT) !>
+        </header>
+
+        <!include includes/features.pym !>
+        <!include includes/cta.pym !>
+        <!include includes/footer.pym !>
+    </div>
+</body>
+</html>

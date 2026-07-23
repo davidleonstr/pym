@@ -1,0 +1,13 @@
+{
+    "language": {
+        "re-pattern": "<!py(.*?)!>",
+        "include-pattern": "<!include(.*?)!>",
+        "eval-one-line": "<!=(.*?)!>",
+        "pysx-pattern": "\\(\\s*(<[\\s\\S]*?>[\\s\\S]*?<\/[^>]+>)\\s*\\)",
+        "pysx-envolve": "f'''{}'''",
+        "python-error-return": "<pre>Python error: {}</pre>"
+    },
+    "common-patterns": {
+        "white-lines": "\\n[ \\t]*\\n"
+    }
+}

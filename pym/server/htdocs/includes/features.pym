@@ -1,0 +1,14 @@
+<section class="features">
+    <div class="feature-card">
+        <h3>Native Integration</h3>
+        <p>No more complex routing or heavy controllers. Write your backend logic exactly where you need it.</p>
+    </div>
+    <div class="feature-card">
+        <h3>WSGI Compatible</h3>
+        <p>Built to run on standard Python web servers. Deployable, extensible, and familiar.</p>
+    </div>
+    <div class="feature-card">
+        <h3>Tag System</h3>
+        <p>Generate clean HTML elements programmatically using the built-in TAG class helper.</p>
+    </div>
+</section>

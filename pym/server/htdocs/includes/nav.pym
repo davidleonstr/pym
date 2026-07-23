@@ -1,0 +1,6 @@
+<nav>
+    <div class="logo">PY<span>M</span></div>
+    <div>
+        <a href="https://github.com/davidleonstr/pym" class="btn" style="padding: 0.5rem 1rem; font-size: 0.8rem;">GitHub</a>
+    </div>
+</nav>
